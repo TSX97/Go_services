@@ -3,8 +3,7 @@ version: '3.8'
 services:
   postgres_db:
     image: postgres:16-alpine
-    container_name: go_postgres_db
-    restart: always
+    container_name: database
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
@@ -13,30 +12,25 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks:
-      - app_network
+
 
   account:
-    build: .
-    container_name: go_app_http
-    restart: always
+    build: 
+      context: .
+      dockerfile: Dockerfile.account
+    container_name: account
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=postgres_db
+      - DB_HOST=database
       - DB_PORT=5432
       - DB_USER=myuser
       - DB_PASSWORD=mypassword
       - DB_NAME=mydb
     depends_on:
       - postgres_db
-    networks:
-      - app_network
 
 volumes:
   pgdata:
 
-networks:
-  app_network:
-    driver: bridge
 
