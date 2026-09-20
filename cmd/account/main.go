@@ -42,6 +42,7 @@ func getUser(w http.ResponseWriter, r *http.Request){
 	for i := 0; i < len(users); i++{
 		if users[i].Id == id {
 			json.NewEncoder(w).Encode(users[i])
+			return
 		}
 	}
 	http.Error(w, "user not found", http.StatusNotFound)
