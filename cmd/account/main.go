@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"context"
 	"net/http"
 	"encoding/json"
-	//"github.com/jackc/pgx/v5"	
+	//"github.com/jackc/pgx/v5"
+	"github.com/TSX97/INK3/db"
 )
 
 type User struct {
@@ -130,5 +132,17 @@ func main(){
 	http.HandleFunc("PATCH /users/{id}", patchUserName)
 	http.HandleFunc("DELETE /users/{id}", deleteUser)
 
+	pool, err := db.NewPool();
+	if err != nil {
+		fmt.Println("connection error")
+	}
+
+	defer pool.Close()
+	
+	err = db.Ping(context.Background(), pool)
+	if err != nil {
+		panic(err)
+	}
+	
 	http.ListenAndServe(":8080", nil)
 }

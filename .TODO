@@ -1,0 +1,7 @@
+- env variables
+
+- swagger API
+
+- /health to API + docker-compose
+
+- DB logic into API
