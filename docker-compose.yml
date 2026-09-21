@@ -5,9 +5,9 @@ services:
     image: postgres:16-alpine
     container_name: database
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -22,11 +22,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=database
-      - DB_PORT=5432
-      - DB_USER=myuser
-      - DB_PASSWORD=mypassword
-      - DB_NAME=mydb
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
     depends_on:
       - postgres_db
 
