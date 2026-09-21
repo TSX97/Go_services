@@ -6,7 +6,7 @@ import (
 	"context"
 	"net/http"
 	"encoding/json"
-	//"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/TSX97/INK3/db"
 )
 
@@ -124,13 +124,18 @@ func deleteUser(w http.ResponseWriter, r *http.Request){
 	http.Error(w, "User not found", http.StatusNotFound)
 }
 
+func healthChecker(pool *pgxpool.Pool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request){
+		if err := pool.Ping(r.Context()); err != nil {
+			http.Error(w, "database is unhealth", http.StatusServiceUnavailable)
+			return
+		}
+	w.WriteHeader(http.StatusOK)
+	}
+
+}
+
 func main(){
-	fmt.Println("start serve on localhost:8080")
-	http.HandleFunc("GET /users", getUsers)
-	http.HandleFunc("GET /users/{id}", getUser)
-	http.HandleFunc("POST /users", addUser)
-	http.HandleFunc("PATCH /users/{id}", patchUserName)
-	http.HandleFunc("DELETE /users/{id}", deleteUser)
 
 	pool, err := db.NewPool();
 	if err != nil {
@@ -143,6 +148,15 @@ func main(){
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("start serve on localhost:8080")
+	http.HandleFunc("GET /users", getUsers)
+	http.HandleFunc("GET /users/{id}", getUser)
+	http.HandleFunc("POST /users", addUser)
+	http.HandleFunc("PATCH /users/{id}", patchUserName)
+	http.HandleFunc("DELETE /users/{id}", deleteUser)
+
+	http.HandleFunc("GET /health", healthChecker(pool))
 	
 	http.ListenAndServe(":8080", nil)
 }

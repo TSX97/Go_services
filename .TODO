@@ -1,7 +1,7 @@
-- env variables
+- add error handler into initialize pgxpool
+
+- write simple ci/cd pipeline
 
 - swagger API
-
-- /health to API + docker-compose
 
 - DB logic into API
