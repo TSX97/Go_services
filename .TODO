@@ -1,4 +1,3 @@
-- hide .env file and add .env.example
 - write commit-msg hook
 - write pre-commit hook
 - write README.md
