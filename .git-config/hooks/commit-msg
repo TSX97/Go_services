@@ -1,0 +1,26 @@
+#!/bin/bash
+
+RED='\0033[0;31m'
+GREEN='\0033[0;32m'
+NC='\0033[0m'
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+echo "start commit-msg hook..."
+
+REGEXP="^(fix|docs|dev|bugfix|refactor|infra)(\([a-z0-9_-]+\))?: .+$|^\(infra\) .+$|^Initial commit: .+$"
+
+if ! echo "$COMMIT_MSG" | grep -Eq "$REGEXP"; then
+    echo -e "${RED}Error: Unsupported commit message format.${NC}"
+    echo "text: '$COMMIT_MSG'"
+    echo "Please, use the project commit style:"
+    echo "  fix(infra): add .env.example"
+    echo "  docs: update project TODO"
+    echo "  dev(account): add GET /health"
+    exit 1
+fi
+
+echo -e "${GREEN}[OK] commit message format is accepted.${NC}"
+exit 0
+

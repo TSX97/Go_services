@@ -1,0 +1,9 @@
+[alias]
+	lg = log --oneline --all --graph
+	last = log -1 HEAD
+	st = status
+	df = diff HEAD^
+	adl = add .
+	rst = reset HEAD
+	rollback = reset --hard HEAD^
+

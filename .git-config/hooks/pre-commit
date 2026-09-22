@@ -1,0 +1,58 @@
+#!/bin/bash
+
+RED='\0033[0;31m'
+GREEN='\0033[0;32m'
+NC='\0033[0m'
+
+echo "start pre-commit check..."
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+EXIT_CODE=0
+
+if [ -z "$STAGED_FILES" ]; then
+    echo -e "${GREEN}no such files for check.${NC}"
+    exit 0
+fi
+
+if echo "$STAGED_FILES" | grep -q '\.go$'; then
+    echo "check Go..."
+    GOFMT_FILES=$(echo "$STAGED_FILES" | grep '\.go$' | xargs gofmt -l)
+    if [ -n "$GOFMT_FILES" ]; then
+        echo -e "${RED}Error: next Go files are not format (try gofmt -w):${NC}"
+        echo "$GOFMT_FILES"
+        EXIT_CODE=1
+    fi
+    if ! go vet ./...; then
+        echo -e "${RED}Error: 'go vet' find problems in code.${NC}"
+        EXIT_CODE=1
+    fi
+fi
+
+# 2. C++ 
+if echo "$STAGED_FILES" | grep -qE '\.(cpp|h|hpp|cc|cxx)$'; then
+    echo "check C++..."
+    echo "$STAGED_FILES" | grep -qE '\.(cpp|h|hpp|cc|cxx)$' | xargs clang-format --dry-run --Werror
+fi
+
+# 3. React / TypeScript / JavaScript
+if echo "$STAGED_FILES" | grep -qE '\.(js|jsx|ts|tsx)$'; then
+    echo "Linter React (JS/TS)..."
+    if [ -f "package.json" ]; then
+        if npm run | grep -q "lint"; then
+            if ! npm run lint; then
+                echo -e "${RED}Error: Linter React (ESLint) exit with error.${NC}"
+                EXIT_CODE=1
+            fi
+        fi
+    fi
+fi
+
+# Итог проверки
+if [ $EXIT_CODE -ne 0 ]; then
+    echo -e "${RED}[ERROR] Commit aborted. Fix syntax or format.${NC}"
+    exit 1
+else
+    echo -e "${GREEN}[OK] All tests completed. Commit is succesful!${NC}"
+    exit 0
+fi
+
