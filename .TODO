@@ -1,7 +1,8 @@
-- add error handler into initialize pgxpool
-
+- hide .env file and add .env.example
+- write commit-msg hook
+- write pre-commit hook
+- write README.md
+- add error handler for initialize pgxpool
+- add database operatiions to API
+- add Swagger API documentation
 - write simple ci/cd pipeline
-
-- swagger API
-
-- DB logic into API
