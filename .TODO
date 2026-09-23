@@ -1,5 +1,4 @@
-- write commit-msg hook
-- write pre-commit hook
+- set up network in docker-compose
 - write README.md
 - add error handler for initialize pgxpool
 - add database operatiions to API

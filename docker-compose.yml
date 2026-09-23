@@ -20,7 +20,8 @@ services:
   account:
     build: 
       context: .
-      dockerfile: Dockerfile.account
+      dockerfile: cmd/account/Dockerfile
+      ignorefile: cmd/account/.dockerignore
     container_name: account
     ports:
       - "8080:8080"

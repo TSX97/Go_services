@@ -1,4 +1,4 @@
-module github.com/TSX97/INK3
+module github.com/TSX97/INK3/cmd/account
 
 go 1.26.8
 
