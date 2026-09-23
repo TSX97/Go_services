@@ -1,8 +1,8 @@
 #!/bin/bash
 
-RED='\0033[0;31m'
-GREEN='\0033[0;32m'
-NC='\0033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
 echo "start pre-commit check..."
 
@@ -14,6 +14,7 @@ if [ -z "$STAGED_FILES" ]; then
     exit 0
 fi
 
+# 1. Go
 if echo "$STAGED_FILES" | grep -q '\.go$'; then
     echo "check Go..."
     GOFMT_FILES=$(echo "$STAGED_FILES" | grep '\.go$' | xargs gofmt -l)
@@ -22,13 +23,22 @@ if echo "$STAGED_FILES" | grep -q '\.go$'; then
         echo "$GOFMT_FILES"
         EXIT_CODE=1
     fi
-    if ! go vet ./...; then
-        echo -e "${RED}Error: 'go vet' find problems in code.${NC}"
+    
+    # Автоматически собираем модули из go.work в одну строку через пробел
+    GO_MODULES=$(go work edit -json | grep -o '"DiskPath": "[^"]*' | cut -d'"' -f4 | sed 's|$|/...|' | tr '\n' ' ')
+    
+    if [ -n "$GO_MODULES" ]; then
+        if ! go vet $GO_MODULES; then
+            echo -e "${RED}Error: 'go vet' found problems in code.${NC}"
+            EXIT_CODE=1
+        fi
+    else
+        echo -e "${RED}Error: no modules found in go.work${NC}"
         EXIT_CODE=1
     fi
 fi
 
-# 2. C++ 
+# 2. C++
 if echo "$STAGED_FILES" | grep -qE '\.(cpp|h|hpp|cc|cxx)$'; then
     echo "check C++..."
     echo "$STAGED_FILES" | grep -qE '\.(cpp|h|hpp|cc|cxx)$' | xargs clang-format --dry-run --Werror
