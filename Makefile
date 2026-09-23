@@ -22,4 +22,6 @@ init:
 	
 	@echo "\$(YELLOW)Ready for development, test & use. Try 'docker compose up --build'\$(NC)"
 	
+	@echo "===-==-==-=- TODO -=-==-==-==="
+	@cat .TODO
 	

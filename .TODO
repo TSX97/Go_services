@@ -1,6 +1,7 @@
-- set up network in docker-compose
 - write README.md
+- set up network in docker-compose
+- write simple ci/cd pipeline
 - add error handler for initialize pgxpool
 - add database operatiions to API
 - add Swagger API documentation
-- write simple ci/cd pipeline
+
