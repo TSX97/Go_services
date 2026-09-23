@@ -1,7 +1,10 @@
 - write README.md
-- set up network in docker-compose
 - write simple ci/cd pipeline
 - add error handler for initialize pgxpool
 - add database operatiions to API
-- add Swagger API documentation
-
+* add Swagger API documentation
+- write registration service API (POST /registration)
+- set up registration service Dockerfile, network
+- add registration service to docker-compose
+- write protobuff for link registration with account service
+- refactor account API
