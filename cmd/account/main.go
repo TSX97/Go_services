@@ -1,17 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"strconv"
 	"context"
-	"net/http"
 	"encoding/json"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"fmt"
 	"github.com/TSX97/INK3/db"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"net/http"
+	"strconv"
 )
 
 type User struct {
-	Id int `json:"id"`
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -23,25 +23,23 @@ func newUser(id int, name string) *User {
 
 // === === === ===REST===API=== === === === \\
 
-
-//	GET /users
-func getUsers(w http.ResponseWriter, r *http.Request){
+// GET /users
+func getUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(users)
 }
 
-//	GET /users{id}
-func getUser(w http.ResponseWriter, r *http.Request){
+// GET /users{id}
+func getUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	id, err := strconv.Atoi(r.PathValue("id"))
-	
 	if err != nil {
 		http.Error(w, "Invalid id", http.StatusBadRequest)
 		return
 	}
-	for i := 0; i < len(users); i++{
+	for i := 0; i < len(users); i++ {
 		if users[i].Id == id {
 			json.NewEncoder(w).Encode(users[i])
 			return
@@ -50,10 +48,10 @@ func getUser(w http.ResponseWriter, r *http.Request){
 	http.Error(w, "user not found", http.StatusNotFound)
 }
 
-//	POST /users
-func addUser(w http.ResponseWriter, r *http.Request){	
+// POST /users
+func addUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -72,17 +70,16 @@ func addUser(w http.ResponseWriter, r *http.Request){
 
 }
 
-//	PATCH /users/{id}
-func patchUserName(w http.ResponseWriter, r *http.Request){
+// PATCH /users/{id}
+func patchUserName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid id", http.StatusBadRequest)
 		return
 	}
 
-	
 	var patch struct {
 		Name *string `json:"name"`
 	}
@@ -108,7 +105,7 @@ func patchUserName(w http.ResponseWriter, r *http.Request){
 	http.Error(w, "User not found", http.StatusNotFound)
 }
 
-func deleteUser(w http.ResponseWriter, r *http.Request){
+func deleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "Invalid id", http.StatusBadRequest)
@@ -125,25 +122,25 @@ func deleteUser(w http.ResponseWriter, r *http.Request){
 }
 
 func healthChecker(pool *pgxpool.Pool) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request){
+	return func(w http.ResponseWriter, r *http.Request) {
 		if err := pool.Ping(r.Context()); err != nil {
 			http.Error(w, "database is unhealth", http.StatusServiceUnavailable)
 			return
 		}
-	w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 	}
 
 }
 
-func main(){
+func main() {
 
-	pool, err := db.NewPool();
+	pool, err := db.NewPool()
 	if err != nil {
-		fmt.Println("connection error")
+		panic(err)
 	}
 
 	defer pool.Close()
-	
+
 	err = db.Ping(context.Background(), pool)
 	if err != nil {
 		panic(err)
@@ -157,6 +154,6 @@ func main(){
 	http.HandleFunc("DELETE /users/{id}", deleteUser)
 
 	http.HandleFunc("GET /health", healthChecker(pool))
-	
+
 	http.ListenAndServe(":8080", nil)
 }

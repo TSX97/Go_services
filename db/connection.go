@@ -1,13 +1,11 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"context"
 	"os"
 )
-
-
 
 func NewPool() (*pgxpool.Pool, error) {
 	ctx := context.Background()
@@ -17,7 +15,7 @@ func NewPool() (*pgxpool.Pool, error) {
 	pass := os.Getenv("DB_PASSWORD")
 	name := os.Getenv("DB_NAME")
 
-	config := fmt.Sprintf("postgres://%s:%s@%s/%s", user, pass, host, port, name)
+	config := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, pass, host, port, name)
 
 	pool, err := pgxpool.New(ctx, config)
 	if err != nil {

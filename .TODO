@@ -1,6 +1,6 @@
 - write README.md
 - write simple ci/cd pipeline
-- add error handler for initialize pgxpool
+- refactor search_by_id in account service
 - add database operatiions to API
 * add Swagger API documentation
 - write registration service API (POST /registration)
